@@ -1,0 +1,119 @@
+{
+  "patterns": [
+    {
+      "level": 1,
+      "stage": 1,
+      "stageId": "stage_1",
+      "letters": [
+        "C",
+        "A",
+        "T",
+        "R",
+        "M",
+        "S",
+        "O",
+        "Y"
+      ],
+      "gridInfo": {
+        "size": 7,
+        "data": [
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "C",
+          "",
+          "",
+          "T",
+          "",
+          "",
+          "R",
+          "A",
+          "T",
+          "",
+          "O",
+          "",
+          "",
+          "",
+          "T",
+          "",
+          "",
+          "Y",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "M",
+          "A",
+          "T",
+          "S",
+          "",
+          ""
+        ]
+      },
+      "validWords": [
+        {
+          "word": "RAT",
+          "placement": {
+            "type": "horizontal",
+            "coordinates": {
+              "row": 4,
+              "startCol": 2,
+              "endCol": 4
+            }
+          }
+        },
+        {
+          "word": "MATS",
+          "placement": {
+            "type": "horizontal",
+            "coordinates": {
+              "row": 7,
+              "startCol": 2,
+              "endCol": 5
+            }
+          }
+        },
+        {
+          "word": "CAT",
+          "placement": {
+            "type": "vertical",
+            "coordinates": {
+              "col": 3,
+              "startRow": 3,
+              "endRow": 5
+            }
+          }
+        },
+        {
+          "word": "TOY",
+          "placement": {
+            "type": "vertical",
+            "coordinates": {
+              "col": 6,
+              "startRow": 3,
+              "endRow": 5
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

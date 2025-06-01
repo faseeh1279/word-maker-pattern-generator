@@ -107,15 +107,62 @@ button:hover {
 
 .actions {
     display: flex;
-    gap: 10px;
+    flex-direction: row;
+    gap: 15px;
+    margin: 25px 0;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
     justify-content: center;
-    margin: 20px 0;
+    align-items: center;
+}
+
+.actions button {
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    min-width: 140px;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.actions button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+#savePattern {
+    background-color: #28a745;
+}
+
+#savePattern:hover {
+    background-color: #218838;
+}
+
+#exportJSON {
+    background-color: #17a2b8;
+}
+
+#exportJSON:hover {
+    background-color: #138496;
+}
+
+#showOutput {
+    background-color: #6c757d;
+}
+
+#showOutput:hover {
+    background-color: #5a6268;
 }
 
 #savedPatterns {
-    margin-top: 30px;
-    padding-top: 20px;
-    border-top: 1px solid #ddd;
+    margin-top: 35px;
+    padding-top: 25px;
+    border-top: 2px solid #e9ecef;
 }
 
 #patternsList {
@@ -123,11 +170,32 @@ button:hover {
 }
 
 .pattern-item {
-    background-color: #f8f8f8;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 4px;
-    border: 1px solid #ddd;
+    background-color: #f8f9fa;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.pattern-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.pattern-item button {
+    margin-top: 10px;
+    margin-right: 8px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.pattern-item button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
 .letters-input {
@@ -203,17 +271,27 @@ button:hover {
 }
 
 #updatePattern {
-    background-color: #9C27B0;
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
 }
 
-#updatePattern:hover {
-    background-color: #7B1FA2;
+#updatePattern:hover:not(:disabled) {
+    background-color: #0056b3;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 123, 255, 0.3);
 }
 
-#updatePattern:disabled,
-#datasetSelect:disabled {
-    opacity: 0.6;
+#updatePattern:disabled {
+    background-color: #6c757d;
     cursor: not-allowed;
+    opacity: 0.65;
+    transform: none;
+    box-shadow: none;
 }
 
 #statistics {
@@ -300,4 +378,283 @@ button:hover {
     margin-top: 30px;
     margin-bottom: 15px;
     color: #333;
+}
+
+.used-letters {
+    margin: 25px auto;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.used-letters h3 {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+#lettersDisplay {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    padding: 10px;
+    background-color: #f8f8f8;
+    border-radius: 4px;
+    min-height: 40px;
+}
+
+.letter-item {
+    background-color: #28a745;
+    padding: 8px 15px;
+    border-radius: 6px;
+    font-size: 16px;
+    box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
+    transition: all 0.3s ease;
+}
+
+.letter-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(40, 167, 69, 0.3);
+}
+
+.letter-item .remove-letter {
+    font-size: 18px;
+    opacity: 0.8;
+    transition: all 0.2s ease;
+}
+
+.letter-item .remove-letter:hover {
+    opacity: 1;
+    color: #ffc107;
+    transform: scale(1.2);
+}
+
+.json-viewer {
+    margin-top: 25px;
+    padding: 20px;
+    background-color: #1e1e1e;
+    border-radius: 8px;
+    border: 1px solid #2d2d2d;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.json-viewer h3 {
+    color: #e0e0e0;
+    margin-bottom: 15px;
+    font-size: 18px;
+    font-weight: 500;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #2d2d2d;
+}
+
+.json-display {
+    display: none;
+    max-height: 400px;
+    overflow-y: auto;
+    background-color: #2d2d2d;
+    color: #e0e0e0;
+    padding: 20px;
+    border-radius: 6px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.json-display.visible {
+    display: block;
+}
+
+/* Custom scrollbar for JSON display */
+.json-display::-webkit-scrollbar {
+    width: 8px;
+}
+
+.json-display::-webkit-scrollbar-track {
+    background: #1e1e1e;
+    border-radius: 4px;
+}
+
+.json-display::-webkit-scrollbar-thumb {
+    background: #4a4a4a;
+    border-radius: 4px;
+}
+
+.json-display::-webkit-scrollbar-thumb:hover {
+    background: #5a5a5a;
+}
+
+#showJSON {
+    background-color: #4a4a4a;
+    color: #ffffff;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    border: 1px solid #5a5a5a;
+}
+
+#showJSON:hover {
+    background-color: #5a5a5a;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Syntax highlighting for JSON */
+.json-display .string { color: #ce9178; }
+.json-display .number { color: #b5cea8; }
+.json-display .boolean { color: #569cd6; }
+.json-display .null { color: #569cd6; }
+.json-display .key { color: #9cdcfe; }
+
+.import-section {
+    margin-top: 15px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+#importData {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
+}
+
+#importData:hover {
+    background-color: #218838;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(40, 167, 69, 0.3);
+}
+
+#datasetSelect {
+    padding: 10px 15px;
+    border-radius: 6px;
+    border: 1px solid #ced4da;
+    min-width: 250px;
+    font-size: 14px;
+    color: #495057;
+    background-color: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+#datasetSelect:focus {
+    border-color: #80bdff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+#datasetSelect:disabled {
+    background-color: #e9ecef;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+#loadPattern {
+    background-color: #17a2b8;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(23, 162, 184, 0.2);
+    border: 1px solid #138496;
+}
+
+#loadPattern:hover:not(:disabled) {
+    background-color: #138496;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(23, 162, 184, 0.3);
+}
+
+#loadPattern:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.65;
+    transform: none;
+    box-shadow: none;
+    border: 1px solid #6c757d;
+}
+
+.section-divider {
+    margin: 30px 0;
+    border: none;
+    border-top: 2px solid #e0e0e0;
+}
+
+#updatedPatterns {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+#updatedPatterns h2 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+#updatedPatternsList {
+    display: grid;
+    gap: 15px;
+}
+
+#updatedPatternsList .pattern-item {
+    background-color: #e8f5e9;
+    border: 1px solid #81c784;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+#updatedPatternsList .pattern-item strong {
+    color: #2e7d32;
+    font-size: 1.1em;
+}
+
+#updatedPatternsList .pattern-item button {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 5px;
+    transition: background-color 0.3s;
+}
+
+#updatedPatternsList .pattern-item button:hover {
+    background-color: #388e3c;
+}
+
+#updatedPatternsList .pattern-item p {
+    color: #666;
+    font-style: italic;
+}
+
+.btn.danger {
+    background-color: #dc3545;
+    color: white;
+    border: 1px solid #dc3545;
+}
+
+.btn.danger:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
 } 

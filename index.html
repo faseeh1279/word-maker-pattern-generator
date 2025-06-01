@@ -20,26 +20,16 @@
             <button id="createGrid">Create Grid</button>
         </div>
 
-        <div class="letters-input">
-            <input type="text" id="lettersInput" placeholder="Enter letters (e.g., F, A, C, T, M)">
-            <button id="resetLetters">Reset Letters</button>
-            <button id="resetGrid">Reset Grid</button>
+        <div class="used-letters">
+            <h3>Used Letters</h3>
+            <div id="lettersDisplay"></div>
         </div>
 
         <div class="actions">
             <button id="savePattern" class="btn">Save Pattern</button>
-            <button id="exportDataset" class="btn">Export Dataset</button>
-            <button id="loadDataset" class="btn">Load Dataset</button>
             <button id="exportJSON">Export as JSON</button>
             <button id="showOutput">Show Output</button>
-        </div>
-
-        <div class="load-dataset">
-            <input type="file" id="datasetFile" accept=".json" style="display: none;">
-            <select id="datasetSelect" disabled>
-                <option value="">Select a pattern to update</option>
-            </select>
-            <button id="updatePattern" disabled>Update Pattern</button>
+            <button id="deleteAllData" class="btn danger">Delete All Data</button>
         </div>
 
         <div id="gridContainer"></div>
@@ -47,35 +37,18 @@
         <div id="savedPatterns">
             <h2>Saved Patterns</h2>
             <div id="patternsList"></div>
+            <div class="json-viewer">
+                <h3>Dataset JSON View</h3>
+                <button id="showJSON">Show All JSON</button>
+                <div id="jsonDisplay" class="json-display"></div>
+            </div>
         </div>
 
-        <div id="statistics">
-            <h2>Statistics</h2>
-            <table id="statsTable">
-                <tr>
-                    <th>Total Patterns</th>
-                    <td id="totalPatterns">0</td>
-                </tr>
-                <tr>
-                    <th>Total Letters Used</th>
-                    <td id="totalLetters">0</td>
-                </tr>
-                <tr>
-                    <th>Average Grid Size</th>
-                    <td id="avgGridSize">0</td>
-                </tr>
-                <tr>
-                    <th>Total Possible Words</th>
-                    <td id="totalWords">0</td>
-                </tr>
-                <tr>
-                    <th>Last Updated</th>
-                    <td id="lastUpdated">Never</td>
-                </tr>
-            </table>
+        <hr class="section-divider">
 
-            <h3>Stage Statistics</h3>
-            <div id="stageStats" class="stage-stats-container"></div>
+        <div id="updatedPatterns">
+            <h2>Updated Patterns</h2>
+            <div id="updatedPatternsList"></div>
         </div>
     </div>
     <script src="script.js"></script>
