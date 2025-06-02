@@ -137,6 +137,29 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Function to get the next available level and stage
+    function getNextLevelAndStage() {
+        const savedPatterns = JSON.parse(localStorage.getItem('patterns') || '[]');
+        
+        if (savedPatterns.length === 0) {
+            return { level: '1', stage: '1' };
+        }
+
+        // Find the highest level
+        const highestLevel = Math.max(...savedPatterns.map(p => parseInt(p.level || '1')));
+        
+        // Find the highest stage in the current level
+        const currentLevelPatterns = savedPatterns.filter(p => parseInt(p.level || '1') === highestLevel);
+        const highestStage = Math.max(...currentLevelPatterns.map(p => parseInt(p.stage || '1')));
+        
+        // If we have 100 stages in the current level, move to next level
+        if (highestStage >= 100) {
+            return { level: (highestLevel + 1).toString(), stage: '1' };
+        }
+        
+        return { level: highestLevel.toString(), stage: (highestStage + 1).toString() };
+    }
+
     // Function to display saved patterns
     function displaySavedPatterns() {
         const savedPatterns = JSON.parse(localStorage.getItem('patterns') || '[]');
@@ -151,6 +174,14 @@ document.addEventListener('DOMContentLoaded', () => {
             updatedPatternsList.innerHTML = '<p>No updated patterns yet.</p>';
             return;
         }
+
+        // Sort patterns by level and stage
+        savedPatterns.sort((a, b) => {
+            const levelA = parseInt(a.level || '1');
+            const levelB = parseInt(b.level || '1');
+            if (levelA !== levelB) return levelA - levelB;
+            return parseInt(a.stage || '1') - parseInt(b.stage || '1');
+        });
 
         // Separate original and updated patterns
         const originalPatterns = savedPatterns.filter(pattern => !pattern.isUpdated);
@@ -173,11 +204,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }).join('<br>');
 
             patternElement.innerHTML = `
-                <strong>Pattern ${pattern.stage || '1'}</strong> (${pattern.gridInfo.size}x${pattern.gridInfo.size})
+                <strong>Level ${pattern.level || '1'}, Stage ${pattern.stage || '1'}</strong> (${pattern.gridInfo.size}x${pattern.gridInfo.size})
+                <br>
+                Stage ID: ${pattern.stageId || `level${pattern.level}_stage${pattern.stage}`}
                 <br>
                 Letters: ${(pattern.letters || []).join(', ')}
-                <br>
-                Stage: ${pattern.stage || '1'}
                 <br>
                 Possible Words:<br>${wordsList || 'No words found'}
                 <br>
@@ -337,19 +368,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (savePatternBtn) {
         savePatternBtn.addEventListener('click', () => {
+            // Validate that the grid has some content
+            const hasContent = currentGrid.some(row => row.some(cell => cell));
+            if (!hasContent) {
+                alert('Please add some letters to the grid before saving.');
+                return;
+            }
+
+            // Get next available level and stage
+            const { level, stage } = getNextLevelAndStage();
+
             const pattern = {
                 gridInfo: {
                     size: currentSize,
-                    data: currentGrid
+                    data: currentGrid.map(row => [...row]) // Create a deep copy of the grid
                 },
                 letters: Array.from(usedLetters),
                 possibleWords: findPossibleWords(currentGrid),
                 timestamp: new Date().toISOString(),
-                stage: '1' // Default stage
+                stage: stage,
+                level: level,
+                stageId: `level${level}_stage${stage}` // Add a unique stage ID
             };
 
             // Get existing patterns from localStorage
             const savedPatterns = JSON.parse(localStorage.getItem('patterns') || '[]');
+            
+            // Add the new pattern
             savedPatterns.push(pattern);
             
             // Save to localStorage
@@ -358,32 +403,50 @@ document.addEventListener('DOMContentLoaded', () => {
             // Update the display
             displaySavedPatterns();
             
+            // Reset the grid and used letters
+            createGrid(currentSize);
+            usedLetters.clear();
+            updateLettersDisplay();
+            
             // Show success message
-            alert('Pattern saved successfully!');
+            alert(`Pattern saved successfully! Level ${level}, Stage ${stage}`);
         });
     }
 
     if (exportJSONBtn) {
         exportJSONBtn.addEventListener('click', () => {
-            const pattern = {
-                gridInfo: {
-                    size: currentSize,
-                    data: currentGrid
-                },
-                letters: Array.from(usedLetters),
-                possibleWords: findPossibleWords(currentGrid),
-                timestamp: new Date().toISOString(),
-                stage: '1' // Default stage
+            // Get all saved patterns
+            const savedPatterns = JSON.parse(localStorage.getItem('patterns') || '[]');
+            
+            if (savedPatterns.length === 0) {
+                alert('No patterns to export. Please save some patterns first.');
+                return;
+            }
+
+            // Create the export data with all patterns
+            const exportData = {
+                patterns: savedPatterns.map(pattern => ({
+                    gridInfo: {
+                        size: pattern.gridInfo.size,
+                        data: pattern.gridInfo.data
+                    },
+                    letters: pattern.letters,
+                    possibleWords: pattern.possibleWords,
+                    timestamp: pattern.timestamp,
+                    stage: pattern.stage,
+                    level: pattern.level,
+                    stageId: pattern.stageId
+                }))
             };
 
             // Create a blob with the JSON data
-            const blob = new Blob([JSON.stringify(pattern, null, 2)], { type: 'application/json' });
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
             
             // Create a download link
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `pattern_${new Date().toISOString().slice(0,10)}.json`;
+            a.download = `patterns_${new Date().toISOString().slice(0,10)}.json`;
             
             // Trigger the download
             document.body.appendChild(a);
@@ -492,92 +555,53 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 cell.addEventListener('click', (e) => {
                     e.preventDefault();
-                    
-                    const input = document.createElement('input');
-                    input.type = 'text';
-                    input.maxLength = 1;
-                    input.style.position = 'fixed';
-                    input.style.top = '0';
-                    input.style.left = '0';
-                    input.style.opacity = '0';
-                    input.style.pointerEvents = 'none';
-                    input.style.zIndex = '-1';
-                    
-                    document.body.appendChild(input);
-                    input.focus();
-                    
-                    input.addEventListener('input', (e) => {
-                        e.preventDefault();
-                        const char = e.target.value.toUpperCase();
-                        if (char) {
-                            cell.textContent = char;
-                            // Ensure the row array exists
-                            if (!currentGrid[i]) {
-                                currentGrid[i] = Array(size).fill('');
-                            }
-                            currentGrid[i][j] = char;
-                            usedLetters.add(char);
-                            updateLettersDisplay();
-                            document.body.removeChild(input);
-                        }
-                    });
-
-                    input.addEventListener('keydown', (e) => {
-                        e.preventDefault();
-                        if (e.key === 'Escape') {
-                            document.body.removeChild(input);
-                        } else if (e.key === 'Backspace') {
-                            // Clear the cell
-                            cell.textContent = '';
-                            // Ensure the row array exists
-                            if (!currentGrid[i]) {
-                                currentGrid[i] = Array(size).fill('');
-                            }
-                            currentGrid[i][j] = '';
-                            
-                            // Update used letters if needed
-                            const currentLetter = cell.textContent;
-                            if (currentLetter) {
-                                // Check if this was the last occurrence of this letter
-                                let letterStillUsed = false;
-                                for (let row = 0; row < size; row++) {
-                                    for (let col = 0; col < size; col++) {
-                                        if (currentGrid[row] && currentGrid[row][col] === currentLetter) {
-                                            letterStillUsed = true;
-                                            break;
-                                        }
-                                    }
-                                    if (letterStillUsed) break;
-                                }
-                                
-                                // If letter is no longer used, remove it from usedLetters
-                                if (!letterStillUsed) {
-                                    usedLetters.delete(currentLetter);
-                                    updateLettersDisplay();
-                                }
-                            }
-                            
-                            document.body.removeChild(input);
-                        } else if (e.key.length === 1) {
-                            const char = e.key.toUpperCase();
-                            cell.textContent = char;
-                            // Ensure the row array exists
-                            if (!currentGrid[i]) {
-                                currentGrid[i] = Array(size).fill('');
-                            }
-                            currentGrid[i][j] = char;
-                            usedLetters.add(char);
-                            updateLettersDisplay();
-                            document.body.removeChild(input);
-                        }
-                    });
-
-                    input.addEventListener('blur', () => {
-                        if (document.body.contains(input)) {
-                            document.body.removeChild(input);
-                        }
-                    });
+                    cell.focus();
                 });
+
+                cell.addEventListener('keydown', (e) => {
+                    e.preventDefault();
+                    
+                    if (e.key === 'Backspace' || e.key === 'Delete') {
+                        // Clear the cell
+                        cell.textContent = '';
+                        currentGrid[i][j] = '';
+                        
+                        // Update used letters if needed
+                        const currentLetter = cell.textContent;
+                        if (currentLetter) {
+                            // Check if this was the last occurrence of this letter
+                            let letterStillUsed = false;
+                            for (let row = 0; row < currentSize; row++) {
+                                for (let col = 0; col < currentSize; col++) {
+                                    if (currentGrid[row] && currentGrid[row][col] === currentLetter) {
+                                        letterStillUsed = true;
+                                        break;
+                                    }
+                                }
+                                if (letterStillUsed) break;
+                            }
+                            
+                            // If letter is no longer used, remove it from usedLetters
+                            if (!letterStillUsed) {
+                                usedLetters.delete(currentLetter);
+                                updateLettersDisplay();
+                            }
+                        }
+                    } else if (e.key.length === 1) {
+                        // Only allow letters
+                        const char = e.key.toUpperCase();
+                        if (/^[A-Z]$/.test(char)) {
+                            cell.textContent = char;
+                            currentGrid[i][j] = char;
+                            usedLetters.add(char);
+                            updateLettersDisplay();
+                        }
+                    }
+                });
+                
+                // Make the cell focusable
+                cell.tabIndex = 0;
+                cell.style.outline = 'none';
                 
                 gridContainer.appendChild(cell);
             }
