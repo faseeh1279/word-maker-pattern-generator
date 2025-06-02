@@ -17,26 +17,57 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentGrid = [];
     let currentSize = 8; // Default size
     let isOutputView = false;
-    let usedLetters = new Set();
+    let letterFrequencies = new Map(); // Tracks minimum required letters for words
+
+    // Function to calculate letter frequencies from a word
+    function calculateWordLetterFrequencies(word) {
+        const frequencies = new Map();
+        for (const letter of word) {
+            frequencies.set(letter, (frequencies.get(letter) || 0) + 1);
+        }
+        return frequencies;
+    }
+
+    // Function to update letter frequencies based on all possible words
+    function updateLetterFrequenciesFromWords() {
+        const words = findPossibleWords(currentGrid);
+        letterFrequencies.clear();
+        
+        // For each word, calculate its letter frequencies
+        words.forEach(({word}) => {
+            const wordFrequencies = calculateWordLetterFrequencies(word);
+            
+            // Update the global frequencies to ensure we have enough letters for each word
+            wordFrequencies.forEach((freq, letter) => {
+                const currentFreq = letterFrequencies.get(letter) || 0;
+                letterFrequencies.set(letter, Math.max(currentFreq, freq));
+            });
+        });
+        
+        updateLettersDisplay();
+    }
 
     // Function to update the letters display
     function updateLettersDisplay() {
         lettersDisplay.innerHTML = '';
-        Array.from(usedLetters).sort().forEach(letter => {
-            const letterElement = document.createElement('div');
-            letterElement.className = 'letter-item';
-            letterElement.innerHTML = `
-                ${letter}
-                <button class="remove-letter" data-letter="${letter}">×</button>
-            `;
-            lettersDisplay.appendChild(letterElement);
-        });
+        // Sort letters alphabetically
+        Array.from(letterFrequencies.entries())
+            .sort(([a], [b]) => a.localeCompare(b))
+            .forEach(([letter, frequency]) => {
+                const letterElement = document.createElement('div');
+                letterElement.className = 'letter-item';
+                letterElement.innerHTML = `
+                    ${letter} (${frequency})
+                    <button class="remove-letter" data-letter="${letter}">×</button>
+                `;
+                lettersDisplay.appendChild(letterElement);
+            });
 
         // Add click handlers for remove buttons
         document.querySelectorAll('.remove-letter').forEach(button => {
             button.addEventListener('click', (e) => {
                 const letter = e.target.dataset.letter;
-                usedLetters.delete(letter);
+                letterFrequencies.delete(letter);
                 updateLettersDisplay();
             });
         });
@@ -270,8 +301,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (pattern) {
             currentSize = pattern.gridInfo.size;
             currentGrid = pattern.gridInfo.data;
-            usedLetters = new Set(pattern.letters);
-            updateLettersDisplay();
+            
+            // Update letter frequencies based on words in the grid
+            updateLetterFrequenciesFromWords();
+            
             createGrid(pattern.gridInfo.size);
             
             const cells = document.querySelectorAll('.grid-cell');
@@ -301,7 +334,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // If we deleted the last pattern, reset the grid
             if (savedPatterns.length === 0) {
                 createGrid(currentSize);
-                usedLetters.clear();
+                letterFrequencies.clear();
                 updateLettersDisplay();
             }
         }
@@ -378,12 +411,17 @@ document.addEventListener('DOMContentLoaded', () => {
             // Get next available level and stage
             const { level, stage } = getNextLevelAndStage();
 
+            // Update letter frequencies based on current words
+            updateLetterFrequenciesFromWords();
+
             const pattern = {
                 gridInfo: {
                     size: currentSize,
                     data: currentGrid.map(row => [...row]) // Create a deep copy of the grid
                 },
-                letters: Array.from(usedLetters),
+                letters: Array.from(letterFrequencies.entries()).map(([letter, freq]) => 
+                    Array(freq).fill(letter)
+                ).flat(), // Convert frequencies to array of letters
                 possibleWords: findPossibleWords(currentGrid),
                 timestamp: new Date().toISOString(),
                 stage: stage,
@@ -405,7 +443,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Reset the grid and used letters
             createGrid(currentSize);
-            usedLetters.clear();
+            letterFrequencies.clear();
             updateLettersDisplay();
             
             // Show success message
@@ -566,35 +604,17 @@ document.addEventListener('DOMContentLoaded', () => {
                         cell.textContent = '';
                         currentGrid[i][j] = '';
                         
-                        // Update used letters if needed
-                        const currentLetter = cell.textContent;
-                        if (currentLetter) {
-                            // Check if this was the last occurrence of this letter
-                            let letterStillUsed = false;
-                            for (let row = 0; row < currentSize; row++) {
-                                for (let col = 0; col < currentSize; col++) {
-                                    if (currentGrid[row] && currentGrid[row][col] === currentLetter) {
-                                        letterStillUsed = true;
-                                        break;
-                                    }
-                                }
-                                if (letterStillUsed) break;
-                            }
-                            
-                            // If letter is no longer used, remove it from usedLetters
-                            if (!letterStillUsed) {
-                                usedLetters.delete(currentLetter);
-                                updateLettersDisplay();
-                            }
-                        }
+                        // Update letter frequencies based on remaining words
+                        updateLetterFrequenciesFromWords();
                     } else if (e.key.length === 1) {
                         // Only allow letters
                         const char = e.key.toUpperCase();
                         if (/^[A-Z]$/.test(char)) {
                             cell.textContent = char;
                             currentGrid[i][j] = char;
-                            usedLetters.add(char);
-                            updateLettersDisplay();
+                            
+                            // Update letter frequencies based on new words
+                            updateLetterFrequenciesFromWords();
                         }
                     }
                 });
